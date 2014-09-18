@@ -1,0 +1,42 @@
+Tutorial 1 notes
+----------------
+1. download glfw for python
+2. download glfw libraries
+	*- https://github.com/FlorianRhiem/pyGLFW  is the version used:  (https://pypi.python.org/pypi/pyglfw/0.1.0)
+	- https://github.com/pyglfw/pyglfw   is another version w/ better documentation but the Florian one 
+	  above does a nicer job of wrapping functionality.
+3. original tuts call for glew, pyopengl seems to include ARB extensions as standard. 
+	a.  [] Research this a bit, find the differences between glew and pyopengl
+	b.  [] figure out how to query for ARB extension existence.  (Maybe http://pyopengl.sourceforge.net/pydoc/OpenGL.extensions.html\
+
+Tutorial 2 notes:
+1.  !!!!! If you mix tabs and spaces the error gets silently squelched by 
+2.  [] Create a custom tutorial describing the differences between VAO's, VBO's, and so on.
+	- http://www.opengl.org/wiki/Tutorial2:_VAOs,_VBOs,_Vertex_and_Fragment_Shaders_(C_/_SDL)
+	- http://www.arcsynthesis.org/gltut/Positioning/Tutorial%2005.html
+	- http://antongerdelan.net/opengl/vertexbuffers.html *
+	- *This tutorial lead to vao_test.py which properly uses the 
+3.  Note the creation of a glew standin (used by tuts 1 and 2)
+
+Tutorial 3 notes:
+1.  Created a replacement for glm (not yuet complete.)
+	- Python operator overload http://rgruet.free.fr/PQR26/PQR2.6.html#SpecialMethods
+	- glm source (headers only, easy to read): https://github.com/g-truc/glm
+2.  glm matrices are defined in terms of columns, copy their source directly.
+3.  Matrix math with glm works differently because matrices are applied from right to left
+	- e.g. MatrixA * MatrixB * V results is MatrixB * V = V` then MatrixA * V` = V``
+
+Tutorial 4 Notes:
+1.  Added key event for 'D' to enable/disable depth to allow the user to see the effects
+	depth testing
+2.  Realized I wasn't clearing data.  Added that to Tuts 2-4 (Tut1 doesn't allocate anything.)
+
+Tutorial 5 Notes:
+1.  Note for the user that there are several image processing libraries.  Some better than others.  :)
+2.  Use PIL to load images
+3.  Research why glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) is necessary for
+    displaying our image.  I'm assuming it's an issue with mipmapping but who knows.
+4.  Dig in to mipmapping, see if there is a way to generate your own mipmapped texturing using PIL
+    operations
+        - http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
+5.  Rename `bind_texture` modes to something resembling useful.

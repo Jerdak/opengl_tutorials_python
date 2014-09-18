@@ -1,5 +1,9 @@
 #! /usr/bin/env python
-""" Tutorial 2: Drawing the triangle
+""" Tutorial 3: Matrices 
+
+	Note(s):
+		- Spend several days/weeks going over matrices.  If your linear-algebra-foo
+		is weak you are going to have a painful time with OpenGL.
 """
 
 from __future__ import print_function
@@ -30,7 +34,7 @@ def opengl_init():
 		return False
 
 	# Open Window and create its OpenGL context
-	window = glfw.create_window(1024, 768, "Tutorial 02", None, None) #(in the accompanying source code this variable will be global)
+	window = glfw.create_window(1024, 768, "Tutorial 03", None, None) #(in the accompanying source code this variable will be global)
 	glfw.window_hint(glfw.SAMPLES, 4)
 	glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
 	glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -66,7 +70,8 @@ def main():
 	vertex_array_id = glGenVertexArrays(1)
 	glBindVertexArray( vertex_array_id )
 
-	program_id = common.LoadShaders( ".\\shaders\\SimpleTransform.vertexshader", ".\\shaders\\SingleColor.fragmentshader" )
+	program_id = common.LoadShaders( ".\\shaders\\Tutorial3\\SimpleTransform.vertexshader", 
+		".\\shaders\\Tutorial3\\SingleColor.fragmentshader" )
 	
 	# Get a handle for our "MVP" uniform
 	matrix_id= glGetUniformLocation(program_id, "MVP");

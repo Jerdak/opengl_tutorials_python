@@ -1,0 +1,1 @@
+cl.exe /I C:\Python27\include /D_USRDLL /D_WINDLL cimg_wrap.c /link /DLL /OUT:cimg.dll

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-""" Tutorial 2: Drawing the triangle
+""" Tutorial 4: A Colored Cube
 """
 
 from __future__ import print_function
@@ -30,7 +30,7 @@ def opengl_init():
 		return False
 
 	# Open Window and create its OpenGL context
-	window = glfw.create_window(1024, 768, "Tutorial 02", None, None) #(in the accompanying source code this variable will be global)
+	window = glfw.create_window(1024, 768, "Tutorial 04", None, None) #(in the accompanying source code this variable will be global)
 	glfw.window_hint(glfw.SAMPLES, 4)
 	glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
 	glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -82,7 +82,8 @@ def main():
 	vertex_array_id = glGenVertexArrays(1)
 	glBindVertexArray( vertex_array_id )
 
-	program_id = common.LoadShaders( ".\\shaders\\TransformVertexShader.vertexshader", ".\\shaders\\ColorFragmentShader.fragmentshader" )
+	program_id = common.LoadShaders( ".\\shaders\\Tutorial4\\TransformVertexShader.vertexshader",
+		".\\shaders\\Tutorial4\\ColorFragmentShader.fragmentshader" )
 	
 	# Get a handle for our "MVP" uniform
 	matrix_id= glGetUniformLocation(program_id, "MVP");
@@ -247,6 +248,7 @@ def main():
 	# note braces around vertex_buffer and vertex_array_id.  
 	# These 2 functions expect arrays of values
 	glDeleteBuffers(1, [vertex_buffer])
+	glDeleteBuffers(1, [color_buffer])
 	glDeleteProgram(program_id)
 	glDeleteVertexArrays(1, [vertex_array_id])
 

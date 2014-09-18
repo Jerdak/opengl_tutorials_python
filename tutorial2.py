@@ -65,7 +65,9 @@ def main():
 	vertex_array_id = glGenVertexArrays(1)
 	glBindVertexArray( vertex_array_id )
 
-	program_id = common.LoadShaders( ".\\shaders\\SimpleVertexShader.vertexshader", ".\\shaders\\SimpleFragmentShader.fragmentshader" )
+	program_id = common.LoadShaders( ".\\shaders\\Tutorial2\\SimpleVertexShader.vertexshader",
+		".\\shaders\\Tutorial2\\SimpleFragmentShader.fragmentshader" )
+	
 	vertex_data = [-1.0, -1.0, 0.0,
 					1.0, -1.0, 0.0,
 					0.0,  1.0, 0.0]
