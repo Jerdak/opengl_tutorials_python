@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-""" Tutorial 5: Textured Cube
+""" Tutorial 6: keyboard and mouse
 """
 
 from __future__ import print_function
@@ -18,6 +18,7 @@ import common
 import glfw
 import sys
 import os
+import controls
 
 # Global window
 window = None
@@ -31,7 +32,7 @@ def opengl_init():
         return False
 
     # Open Window and create its OpenGL context
-    window = glfw.create_window(1024, 768, "Tutorial 05", None, None) #(in the accompanying source code this variable will be global)
+    window = glfw.create_window(1024, 768, "Tutorial 06", None, None) #(in the accompanying source code this variable will be global)
     glfw.window_hint(glfw.SAMPLES, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -48,7 +49,7 @@ def opengl_init():
     glewExperimental = True
 
     # GLEW is a framework for testing extension availability.  Please see tutorial notes for
-    # more information including why can remove this code.
+    # more information including why can remove this code.a
     if glewInit() != GLEW_OK:
         print("Failed to initialize GLEW\n",file=sys.stderr);
         return False
@@ -121,39 +122,25 @@ def main():
 
     # Enable key events
     glfw.set_input_mode(window,glfw.STICKY_KEYS,GL_TRUE) 
-    
+    glfw.set_cursor_pos(window, 1024/2, 768/2)
+
     # Set opengl clear color to something other than red (color used by the fragment shader)
     glClearColor(0.0,0.0,0.4,0.0)
     
     # Enable depth test
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST)
     # Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS); 
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE)
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray( vertex_array_id )
 
-
-    program_id = common.LoadShaders( ".\\shaders\\Tutorial5\\TransformVertexShader.vertexshader",
-        ".\\shaders\\Tutorial5\\TextureFragmentShader.fragmentshader" )
+    program_id = common.LoadShaders( ".\\shaders\\Tutorial6\\TransformVertexShader.vertexshader",
+        ".\\shaders\\Tutorial6\\TextureFragmentShader.fragmentshader" )
     
     # Get a handle for our "MVP" uniform
     matrix_id = glGetUniformLocation(program_id, "MVP");
-
-    # Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    projection = mat4.perspective(45.0, 4.0 / 3.0, 0.1, 100.0)
-    
-    # Camera matrix
-    view = mat4.lookat(vec3(4,3,-3), # Camera is at (4,3,3), in World Space
-                    vec3(0,0,0), # and looks at the origin
-                    vec3(0,1,0)) 
-    
-    # Model matrix : an identity matrix (model will be at the origin)
-    model = mat4.identity()
-
-    # Our ModelViewProjection : multiplication of our 3 matrices
-    mvp = projection * view * model
-
 
     texture = load_image(".\\content\\uvtemplate.bmp")
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
@@ -247,12 +234,19 @@ def main():
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
     glBufferData(GL_ARRAY_BUFFER, len(uv_data) * 4, array_type(*uv_data), GL_STATIC_DRAW)
 
-
-
+    # vsync and glfw do not play nice.  when vsync is enabled mouse movement is jittery.
+    common.disable_vsyc()
+    
     while glfw.get_key(window,glfw.KEY_ESCAPE) != glfw.PRESS and not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(program_id)
+
+        controls.computeMatricesFromInputs(window)
+        ProjectionMatrix = controls.getProjectionMatrix();
+        ViewMatrix = controls.getViewMatrix();
+        ModelMatrix = mat4.identity();
+        mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
         # Send our transformation to the currently bound shader, 
         # in the "MVP" uniform

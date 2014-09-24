@@ -115,7 +115,10 @@ class mat4(object):
 
 	def __mul__(self,other):
 		m = mat4.zeroes()
-		a = other#self
+		
+		# swap matrix multiplication order
+		# glm was the basis for this code. 
+ 		a = other#self
 		b = self#other
 		
 		for r in range(0,4):
@@ -123,7 +126,7 @@ class mat4(object):
 				for i in range(0,4):
 					m[r][c] += a[r][i] * b[i][c]
 
-		print("result--\n",m)
+		#print("result--\n",m)
 		return m
 	
 	#def __imul__(self,other):

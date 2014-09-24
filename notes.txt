@@ -40,3 +40,6 @@ Tutorial 5 Notes:
     operations
         - http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
 5.  Rename `bind_texture` modes to something resembling useful.
+
+Tutorial 6 notes:
+1.  Seriously review Sin/Cos and how they relate to spherical coordinates

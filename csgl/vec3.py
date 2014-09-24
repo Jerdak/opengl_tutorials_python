@@ -5,10 +5,20 @@
 	PyOpenGL supports numpy 
 """
 from OpenGL.GL import *
+from multimethods import multimethod
+from multimethods import multimethod2
 
 import sys
 import math
 import copy
+import operator
+
+def arith(op,a,b):
+	btype = type(b)
+	if btype is vec3:
+		return vec3(op(a.x,b.x),op(a.y,b.y),op(a.z,b.z))
+	elif btype is float or btype is int:
+		return vec3(op(a.x,b),op(a.y,b),op(a.z,b))
 
 class vec3(object):
 	def __init__(self,x=0,y=0,z=0):
@@ -70,52 +80,44 @@ class vec3(object):
 	def normalized(self):
 		l = self.length()
 		return vec3(self.x / l, self.y / l, self.z / l)
-
-	def __add__(self,other):
-		return vec3(self.x+other.x,self.y+other.y,self.z+other.z)
 	
-	def __iadd__(self,other):
-		self.x += other.x
-		self.y += other.y
-		self.z += other.z
-		return self
+	@staticmethod
+	def arith(op,a,b):
+		rtype = type(b)
+		if rtype is vec3:
+			return vec3(op(a.x,b.x),op(a.y,b.y),op(a.z,b.z))
+		elif rtype is float or rtype is int:
+			return vec3(op(a.x,b),op(a.y,b),op(a.z,b))
 
-	def __sub__(self,other):
-		return vec3(self.x-other.x,self.y-other.y,self.z-other.z)
+	@staticmethod
+	def arith_inline(op,a,b):
+		rtype = type(b)
+		if rtype is vec3:
+			a.x = op(a.x,b.x)
+			a.y = op(a.y,b.y)
+			a.z = op(a.z,b.z)
+			return a
+		elif rtype is float or rtype is int:
+			a.x = op(a.x,b)
+			a.y = op(a.y,b)
+			a.z = op(a.z,b)
+			return a
+
+	def __add__(self, other):return vec3.arith(operator.add,self,other)
+	def __iadd__(self,other):return vec3.arith_inline(operator.add,self,other)
+	def __radd__(self,other):return vec3.arith(operator.add,self,other)
 	
-	def __isub__(self,other):
-		self.x -= other.x
-		self.y -= other.y
-		self.z -= other.z
-		return self
+	def __sub__(self, other):return vec3.arith(operator.sub,self,other)
+	def __isub__(self,other):return vec3.arith_inline(operator.sub,self,other)
+	def __rsub__(self,other):return vec3.arith(operator.sub,self,other)
 
-	def __sub__(self,other):
-		return vec3(self.x-other.x,self.y-other.y,self.z-other.z)
-	
-	def __isub__(self,other):
-		self.x -= other.x
-		self.y -= other.y
-		self.z -= other.z
-		return self
+	def __mul__(self, other):return vec3.arith(operator.mul,self,other)
+	def __imul__(self,other):return vec3.arith_inline(operator.mul,self,other)
+	def __rmul__(self,other):return vec3.arith(operator.mul,self,other)
 
-	def __mul__(self,other):
-		return vec3(self.x*other.x,self.y*other.y,self.z*other.z)
-	
-	def __imul__(self,other):
-		self.x *= other.x
-		self.y *= other.y
-		self.z *= other.z
-		return self
-
-
-	def __div__(self,other):
-		return vec3(self.x/other.x,self.y/other.y,self.z/other.z)
-	
-	def __idiv__(self,other):
-		self.x /= other.x
-		self.y /= other.y
-		self.z /= other.z
-		return self
+	def __div__(self, other):return vec3.arith(operator.div,self,other)
+	def __idiv__(self,other):return vec3.arith_inline(operator.div,self,other)
+	def __rdiv__(self,other):return vec3.arith(operator.div,self,other)
 
 	def __eq__(self,other):
 		if math.fabs(self.x - other.x) >= sys.float_info.epsilon:return False
@@ -132,11 +134,20 @@ class vec3(object):
 	def __unicode__(self):
 		return "%f %f %f"%(self.x,self.y,self.z)
 
-
 def main():
 	x = vec3(1,2,3)
 	y = vec3(1,2,3)
 	xy = x+y
+	print(xy)
+	print(x+1)
+	print(12+x)
+
+	xy = x*y
+	print(xy)
+	xy = 1+x*y
+	print(xy)
+	return
+	
 	xy_actual = vec3(2,4,6)
 	assert(xy == xy_actual)
 
