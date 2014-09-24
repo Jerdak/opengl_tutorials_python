@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-""" Tutorial 6: keyboard and mouse
+""" Tutorial 7: Model Loading
 """
 
 from __future__ import print_function
@@ -19,6 +19,7 @@ import glfw
 import sys
 import os
 import controls
+import objloader
 
 # Global window
 window = None
@@ -117,6 +118,8 @@ def load_image(file_name):
     return texture_id
 
 def main():
+
+    # Initialize GLFW and open a window
     if not opengl_init():
         return
 
@@ -129,110 +132,46 @@ def main():
     
     # Enable depth test
     glEnable(GL_DEPTH_TEST)
+
     # Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LESS)
+
+    # Cull triangles which normal is not towards the camera
     glEnable(GL_CULL_FACE)
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray( vertex_array_id )
 
-    program_id = common.LoadShaders( ".\\shaders\\Tutorial6\\TransformVertexShader.vertexshader",
-        ".\\shaders\\Tutorial6\\TextureFragmentShader.fragmentshader" )
+    # Create and compile our GLSL program from the shaders
+    program_id = common.LoadShaders( ".\\shaders\\Tutorial7\\TransformVertexShader.vertexshader",
+        ".\\shaders\\Tutorial7\\TextureFragmentShader.fragmentshader" )
     
     # Get a handle for our "MVP" uniform
     matrix_id = glGetUniformLocation(program_id, "MVP");
 
-    texture = load_image(".\\content\\uvtemplate.bmp")
+    # Load the texture
+    texture = load_image(".\\content\\uvmap.bmp")
+
+    # Get a handle for our "myTextureSampler" uniform
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
 
-    # Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    # A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    vertex_data = [ 
-        -1.0,-1.0,-1.0,
-        -1.0,-1.0, 1.0,
-        -1.0, 1.0, 1.0,
-         1.0, 1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0,-1.0,
-         1.0,-1.0, 1.0,
-        -1.0,-1.0,-1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0,-1.0,
-         1.0,-1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0, 1.0,
-        -1.0, 1.0,-1.0,
-         1.0,-1.0, 1.0,
-        -1.0,-1.0, 1.0,
-        -1.0,-1.0,-1.0,
-        -1.0, 1.0, 1.0,
-        -1.0,-1.0, 1.0,
-         1.0,-1.0, 1.0,
-         1.0, 1.0, 1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0,-1.0,
-         1.0,-1.0,-1.0,
-         1.0, 1.0, 1.0,
-         1.0,-1.0, 1.0,
-         1.0, 1.0, 1.0,
-         1.0, 1.0,-1.0,
-        -1.0, 1.0,-1.0,
-         1.0, 1.0, 1.0,
-        -1.0, 1.0,-1.0,
-        -1.0, 1.0, 1.0,
-         1.0, 1.0, 1.0,
-        -1.0, 1.0, 1.0,
-         1.0,-1.0, 1.0]
+    # Read our OBJ file
+    vertices,faces,uvs,normals,colors = objloader.load("cube.obj")
+    vertex_data,uv_data = objloader.process_obj( vertices,faces,uvs,normals,colors)
 
-    # Two UV coordinatesfor each vertex. They were created withe Blender.
-    uv_data = [ 
-        0.000059, 1.0-0.000004, 
-        0.000103, 1.0-0.336048, 
-        0.335973, 1.0-0.335903, 
-        1.000023, 1.0-0.000013, 
-        0.667979, 1.0-0.335851, 
-        0.999958, 1.0-0.336064, 
-        0.667979, 1.0-0.335851, 
-        0.336024, 1.0-0.671877, 
-        0.667969, 1.0-0.671889, 
-        1.000023, 1.0-0.000013, 
-        0.668104, 1.0-0.000013, 
-        0.667979, 1.0-0.335851, 
-        0.000059, 1.0-0.000004, 
-        0.335973, 1.0-0.335903, 
-        0.336098, 1.0-0.000071, 
-        0.667979, 1.0-0.335851, 
-        0.335973, 1.0-0.335903, 
-        0.336024, 1.0-0.671877, 
-        1.000004, 1.0-0.671847, 
-        0.999958, 1.0-0.336064, 
-        0.667979, 1.0-0.335851, 
-        0.668104, 1.0-0.000013, 
-        0.335973, 1.0-0.335903, 
-        0.667979, 1.0-0.335851, 
-        0.335973, 1.0-0.335903, 
-        0.668104, 1.0-0.000013, 
-        0.336098, 1.0-0.000071, 
-        0.000103, 1.0-0.336048, 
-        0.000004, 1.0-0.671870, 
-        0.336024, 1.0-0.671877, 
-        0.000103, 1.0-0.336048, 
-        0.336024, 1.0-0.671877, 
-        0.335973, 1.0-0.335903, 
-        0.667969, 1.0-0.671889, 
-        1.000004, 1.0-0.671847, 
-        0.667979, 1.0-0.335851]
+    # Our OBJ loader uses Python lists, convert to ctype arrays before sending to OpenGL
+    vertex_data = objloader.generate_2d_ctypes(vertex_data)
+    uv_data = objloader.generate_2d_ctypes(uv_data)
 
+    # Load OBJ in to a VBO
     vertex_buffer = glGenBuffers(1);
-    array_type = GLfloat * len(vertex_data)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-    glBufferData(GL_ARRAY_BUFFER, len(vertex_data) * 4, array_type(*vertex_data), GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, len(vertex_data) * 4 * 3, vertex_data, GL_STATIC_DRAW)
 
-    uv_buffer = glGenBuffers(1);
+    uv_buffer = glGenBuffers(1)
     array_type = GLfloat * len(uv_data)
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
-    glBufferData(GL_ARRAY_BUFFER, len(uv_data) * 4, array_type(*uv_data), GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, len(uv_data) * 4 * 2, uv_data, GL_STATIC_DRAW)
 
     # vsync and glfw do not play nice.  when vsync is enabled mouse movement is jittery.
     common.disable_vsyc()
