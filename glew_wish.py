@@ -33,11 +33,17 @@ def glewAreYouKidding():
 
 		The GLEW header contains macros and definitions to enumerate
 		available OpenGL functionality. The only way to provide these
-		variables in the global namespace of Python it is necessary to
-		work backwards through the call stack to add them globally.
+		variables in the global namespace of Python is to
+		work backwards through the call stack to add them globally
+        to each calling stack frame.
 
-		Note:  This *heavily* pollutes all calling namespaces.
 
+		Note:  Seriously, this is a garbage hack.  It will *heavily* pollutes
+        all calling namespaces.
+
+        Some functionality here might be useful later for injecting GLEW-like
+        definitions in to Python.  Alternatively these functions could just 
+        be moved in to a class that adds them to its members
 
 	"""
 	if not GLEW_INITIALIZED:
@@ -65,7 +71,7 @@ def glewIsSupported(var):
 
 		TODO: 
 			- Only the extension parameter is currently checked. Validate
-			the core as well.  Will likely require scrapping opengl docs
+			the core as well.  Will likely require scraping opengl docs
 			for supported functionality
 	"""
 	var = re.sub(' +',' ',var)
@@ -85,8 +91,15 @@ def glewGetExtension(extension):
 	return False
 
 def glewInit(unsafe=False):
-	""" GLEW initialization function, must
+	""" GLEW initialization hack
+
+        Glew Python packages are severely stale.  PyOpenGL does a 
+        good job of exposing available functionality for OpenGL.
+        It's likely GLEW is part of the PyOpenGL source (TODO: verify)
 		
+        This glewInit works and will actually come up with a set of valid
+        extensions supported by user's graphics card.
+
 		Input
 			unsafe (bool): if true, calls glewAreYouKidding to add glew definitions
 			to Pythons call stack (every single file)

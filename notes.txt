@@ -43,3 +43,11 @@ Tutorial 5 Notes:
 
 Tutorial 6 notes:
 1.  Seriously review Sin/Cos and how they relate to spherical coordinates
+2.  Added a common.disable_vsyc() method.  Calling this will stabilize mouse look,
+otherwise it gets all jittery (will need to be fixed in later tuts.)
+
+Tutorial 7 notes:
+1.  OBJ loader created.  Some functionality is lacking and the lower requires normals and uvs
+or the loader gets all stupid.
+2.  Don't go too far making the obj loader work.  It just needs to function w/ the given content.
+Let the user handle the rest.

@@ -88,6 +88,24 @@ def parse_uv_line(tokens):
 
     return [float(uv[0]),float(uv[1])]
 
+def parse_normal_line(tokens):
+    """ Parse Wavefront OBJ normal line
+
+        Input:
+            tokens - Array of normal line tokens as strings
+                Format: ['vn','0.4','0.5','0.6']
+    """
+
+    size = len(tokens)
+
+    # valid uv strings are 'vn 0.1 0.1 0.1'
+    if not (size == 4): return None
+    if not (tokens[0] in ['vn','VN']): return None
+
+    # x/y/z values will *always* be the first values after the line identifier
+    normals = tokens[1:4]
+
+    return [float(normals[0]),float(normals[1]),float(normals[2])]
 def parse_face_line(tokens):
     """ Parse Wavefront OBJ face line
 
@@ -152,13 +170,15 @@ def load(file_name,normalize=False):
         'f':parse_face_line,
         'F':parse_face_line,
         'vt':parse_uv_line,
+        'vn':parse_normal_line,
     })
     obj_parse_assignment = defaultdict(lambda : lambda a: None,{
         'v':lambda b:verts.append(b),
         'V':lambda b:verts.append(b),
         'f':lambda b:faces.append(b),
         'F':lambda b:faces.append(b),
-        'vt':lambda b:uvs.append(b)
+        'vt':lambda b:uvs.append(b),
+        'vn':lambda b:norms.append(b)
     })
 
     verts = []
@@ -200,6 +220,7 @@ def process_obj(verts,faces,uvs,normals,colors):
     # Faces currently store 6 values, split them up a bit
     out_verts = []
     out_uvs = []
+    out_normals = []
     for face in faces:
         out_verts.append(verts[face[0]-1])
         out_verts.append(verts[face[1]-1])
@@ -209,7 +230,10 @@ def process_obj(verts,faces,uvs,normals,colors):
         out_uvs.append(uvs[face[4]-1])
         out_uvs.append(uvs[face[5]-1])
 
-    return out_verts,out_uvs
+        out_normals.append(normals[face[6]-1])
+        out_normals.append(normals[face[7]-1])
+        out_normals.append(normals[face[8]-1])
+    return out_verts,out_uvs,out_normals
 
 def generate_2d_ctypes(data):
     """ Covert 2D Python list of lists to 2D ctype array
@@ -264,10 +288,11 @@ def main():
     # #obj_parse_assignment["#"](c)
     # print(c)
 
-    v,f,uv,n,c = load("cube.obj");
-    v,uv = process_obj(v,f,uv,n,c)
+    v,f,uv,n,c = load(".\\content\\suzanne.obj");
+    v,uv,n = process_obj(v,f,uv,n,c)
     print(v[0])
     print(uv[0])
+    print(n[0])
 if __name__ == '__main__':
     main()
 

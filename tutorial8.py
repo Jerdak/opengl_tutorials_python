@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-""" Tutorial 7: Model Loading
+""" Tutorial 8: Basic Shading
 """
 
 from __future__ import print_function
@@ -52,7 +52,7 @@ def opengl_init():
     # GLEW is a framework for testing extension availability.  Please see tutorial notes for
     # more information including why can remove this code.a
     if glewInit() != GLEW_OK:
-        print("Failed to initialize GLEW\n",file=stderropen.sys)
+        print("Failed to initialize GLEW\n",file=stderropen.sys);
         return False
     return True
 
@@ -106,7 +106,7 @@ def load_image(file_name):
     # To use OpenGL 4.2 ARB_texture_storage to automatically generate a single mipmap layer
     # uncomment the 3 lines below.  Note that this should replaced glTexImage2D below.
     #bind_texture(texture_id,'DEFAULT')
-    #glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height)
+    #glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
     #glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,image)
     
     # "Bind" the newly created texture : all future texture functions will modify this texture
@@ -143,63 +143,78 @@ def main():
     glBindVertexArray( vertex_array_id )
 
     # Create and compile our GLSL program from the shaders
-    program_id = common.LoadShaders( ".\\shaders\\Tutorial7\\TransformVertexShader.vertexshader",
-        ".\\shaders\\Tutorial7\\TextureFragmentShader.fragmentshader" )
+    program_id = common.LoadShaders( ".\\shaders\\Tutorial8\\StandardShading.vertexshader",
+        ".\\shaders\\Tutorial8\\StandardShading.fragmentshader" )
     
     # Get a handle for our "MVP" uniform
     matrix_id = glGetUniformLocation(program_id, "MVP")
+    view_matrix_id = glGetUniformLocation(program_id, "V")
+    model_matrix_id = glGetUniformLocation(program_id, "M")
 
     # Load the texture
-    texture = load_image(".\\content\\eva.bmp")
+    texture = load_image(".\\content\\uvmap_suzanne.bmp")
 
     # Get a handle for our "myTextureSampler" uniform
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
 
     # Read our OBJ file
-    vertices,faces,uvs,normals,colors = objloader.load(".\\content\\eva.obj")
+    vertices,faces,uvs,normals,colors = objloader.load(".\\content\\suzanne.obj")
     vertex_data,uv_data,normal_data = objloader.process_obj( vertices,faces,uvs,normals,colors)
 
     # Our OBJ loader uses Python lists, convert to ctype arrays before sending to OpenGL
     vertex_data = objloader.generate_2d_ctypes(vertex_data)
     uv_data = objloader.generate_2d_ctypes(uv_data)
+    normal_data = objloader.generate_2d_ctypes(normal_data)
 
     # Load OBJ in to a VBO
-    vertex_buffer = glGenBuffers(1)
+    vertex_buffer = glGenBuffers(1);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
     glBufferData(GL_ARRAY_BUFFER, len(vertex_data) * 4 * 3, vertex_data, GL_STATIC_DRAW)
 
     uv_buffer = glGenBuffers(1)
-    array_type = GLfloat * len(uv_data)
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
     glBufferData(GL_ARRAY_BUFFER, len(uv_data) * 4 * 2, uv_data, GL_STATIC_DRAW)
+
+    normal_buffer = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)
+    glBufferData(GL_ARRAY_BUFFER, len(normal_data) * 4 * 3, normal_data, GL_STATIC_DRAW)
 
     # vsync and glfw do not play nice.  when vsync is enabled mouse movement is jittery.
     common.disable_vsyc()
     
+    # Get a handle for our "LightPosition" uniform
+    glUseProgram(program_id);
+    light_id = glGetUniformLocation(program_id, "LightPosition_worldspace");
+
     while glfw.get_key(window,glfw.KEY_ESCAPE) != glfw.PRESS and not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(program_id)
 
         controls.computeMatricesFromInputs(window)
-        ProjectionMatrix = controls.getProjectionMatrix()
-        ViewMatrix = controls.getViewMatrix()
-        ModelMatrix = mat4.identity()
-        mvp = ProjectionMatrix * ViewMatrix * ModelMatrix
+        ProjectionMatrix = controls.getProjectionMatrix();
+        ViewMatrix = controls.getViewMatrix();
+        ModelMatrix = mat4.identity();
+        mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
         # Send our transformation to the currently bound shader, 
         # in the "MVP" uniform
         glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data_)
-        
+        glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, ModelMatrix.data_);
+        glUniformMatrix4fv(view_matrix_id, 1, GL_FALSE, ViewMatrix.data_);
+
+        lightPos = vec3(4,4,4)
+        glUniform3f(light_id, lightPos.x, lightPos.y, lightPos.z)
+
         # Bind our texture in Texture Unit 0
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, texture)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
         # Set our "myTextureSampler" sampler to user Texture Unit 0
-        glUniform1i(texture_id, 0)
+        glUniform1i(texture_id, 0);
 
         #1rst attribute buffer : vertices
         glEnableVertexAttribArray(0)
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
         glVertexAttribPointer(
             0,                  # attribute 0. No particular reason for 0, but must match the layout in the shader.
             3,                  # len(vertex_data)
@@ -211,7 +226,7 @@ def main():
 
         # 2nd attribute buffer : colors
         glEnableVertexAttribArray(1)
-        glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
+        glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
         glVertexAttribPointer(
             1,                  # attribute 1. No particular reason for 1, but must match the layout in the shader.
             2,                  # len(vertex_data)
@@ -221,6 +236,19 @@ def main():
             null                # array buffer offset (c_type == void*)
             )
 
+        # 3rd attribute buffer : normals
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
+        glVertexAttribPointer(
+            2,                                  # attribute
+            3,                                  # size
+            GL_FLOAT,                           # type
+            GL_FALSE,                           # ormalized?
+            0,                                  # stride
+            null                                # array buffer offset (c_type == void*)
+        )
+
+
         # Draw the triangles, vertex data now contains individual vertices
         # so use array length
         glDrawArrays(GL_TRIANGLES, 0, len(vertex_data))
@@ -228,6 +256,7 @@ def main():
         # Not strictly necessary because we only have 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
+        glDisableVertexAttribArray(2)
     
     
         # Swap front and back buffers
@@ -240,6 +269,7 @@ def main():
     # glDeleteBuffers expects a list of buffers to delete
     glDeleteBuffers(1, [vertex_buffer])
     glDeleteBuffers(1, [uv_buffer])
+    glDeleteBuffers(1, [normal_buffer])
     glDeleteProgram(program_id)
     glDeleteTextures([texture_id])
     glDeleteVertexArrays(1, [vertex_array_id])
