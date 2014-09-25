@@ -33,7 +33,7 @@ def opengl_init():
         return False
 
     # Open Window and create its OpenGL context
-    window = glfw.create_window(1024, 768, "Tutorial 06", None, None) #(in the accompanying source code this variable will be global)
+    window = glfw.create_window(1024, 768, "Tutorial 08", None, None) #(in the accompanying source code this variable will be global)
     glfw.window_hint(glfw.SAMPLES, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -186,8 +186,17 @@ def main():
     glUseProgram(program_id);
     light_id = glGetUniformLocation(program_id, "LightPosition_worldspace");
 
+    last_time = glfw.get_time()
+    frames = 0
+
     while glfw.get_key(window,glfw.KEY_ESCAPE) != glfw.PRESS and not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT)
+
+        current_time = glfw.get_time()
+        if current_time - last_time >= 1.0:
+            glfw.set_window_title(window,"Tutorial 8.  FPS: %d"%(frames))
+            frames = 0
+            last_time = current_time
 
         glUseProgram(program_id)
 
@@ -264,6 +273,8 @@ def main():
 
         # Poll for and process events
         glfw.poll_events()
+
+        frames += 1
 
     # !Note braces around vertex_buffer and uv_buffer.  
     # glDeleteBuffers expects a list of buffers to delete
