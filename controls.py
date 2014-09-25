@@ -78,19 +78,19 @@ def computeMatricesFromInputs(window):
     up = vec3.cross( right, direction )
 
     # Move forward
-    if glfw.get_key( window, glfw.KEY_UP ) == glfw.PRESS:
+    if glfw.get_key( window, glfw.KEY_UP ) == glfw.PRESS or glfw.get_key( window, glfw.KEY_W ) == glfw.PRESS:
         position += direction * deltaTime * speed;
     
     # Move backward
-    if glfw.get_key( window, glfw.KEY_DOWN ) == glfw.PRESS:
+    if glfw.get_key( window, glfw.KEY_DOWN ) == glfw.PRESS or glfw.get_key( window, glfw.KEY_S ) == glfw.PRESS:
         position -= direction * deltaTime * speed
     
     # Strafe right
-    if glfw.get_key( window, glfw.KEY_RIGHT ) == glfw.PRESS:
+    if glfw.get_key( window, glfw.KEY_RIGHT ) == glfw.PRESS or glfw.get_key( window, glfw.KEY_D ) == glfw.PRESS:
         position += right * deltaTime * speed
     
     # Strafe left
-    if glfw.get_key( window, glfw.KEY_LEFT ) == glfw.PRESS:
+    if glfw.get_key( window, glfw.KEY_LEFT ) == glfw.PRESS or glfw.get_key( window, glfw.KEY_A ) == glfw.PRESS:
         position -= right * deltaTime * speed
     
 
