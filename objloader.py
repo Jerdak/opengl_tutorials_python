@@ -99,6 +99,9 @@ def parse_face_line(tokens):
         Output:
             face - Single triangluar face.
                 Format: [corner_a,corner_b,corner_c,uv_a,uv_b,uv_c,normal_a,normal_b,normal_c]
+
+        TODO:
+            * Support faces like F 1/1 2/2 3/3, where I suppose we're assuming the 2nd coord is uv
     """
 
     size = len(tokens)
@@ -132,6 +135,17 @@ def parse_face_line(tokens):
 
 
 def load(file_name,normalize=False):
+    """ Load Wavefront OBJ
+
+        TODO:
+            * Support for usemtl and textures
+            * Support for 'o' groups
+            * Support for 'vn' normals and their respective per-face indexing
+            * Current version assumes UV data exists, make function
+            a bit more bulletproof towards unessential data.
+    """
+
+    # Build line parse mappings -> {'wavefront line element':token_parser()}
     obj_line_parsers = defaultdict(lambda : lambda a: None,{
         'v':parse_vertex_line,
         'V':parse_vertex_line,

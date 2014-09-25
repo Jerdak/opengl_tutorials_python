@@ -52,7 +52,7 @@ def opengl_init():
     # GLEW is a framework for testing extension availability.  Please see tutorial notes for
     # more information including why can remove this code.a
     if glewInit() != GLEW_OK:
-        print("Failed to initialize GLEW\n",file=sys.stderr);
+        print("Failed to initialize GLEW\n",file=stderropen.sys);
         return False
     return True
 
@@ -150,19 +150,21 @@ def main():
     matrix_id = glGetUniformLocation(program_id, "MVP");
 
     # Load the texture
-    texture = load_image(".\\content\\uvmap.bmp")
+    texture = load_image(".\\content\\eva.bmp")
 
     # Get a handle for our "myTextureSampler" uniform
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
 
     # Read our OBJ file
-    vertices,faces,uvs,normals,colors = objloader.load("cube.obj")
+    vertices,faces,uvs,normals,colors = objloader.load(".\\content\\eva.obj")
     vertex_data,uv_data = objloader.process_obj( vertices,faces,uvs,normals,colors)
 
     # Our OBJ loader uses Python lists, convert to ctype arrays before sending to OpenGL
     vertex_data = objloader.generate_2d_ctypes(vertex_data)
     uv_data = objloader.generate_2d_ctypes(uv_data)
 
+    print(len(vertex_data) * 4 * 3)
+    print(vertex_data[344][0])
     # Load OBJ in to a VBO
     vertex_buffer = glGenBuffers(1);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
@@ -221,8 +223,9 @@ def main():
             null                # array buffer offset (c_type == void*)
             )
 
-        # Draw the triangle !
-        glDrawArrays(GL_TRIANGLES, 0, 12*3) #3 indices starting at 0 -> 1 triangle
+        # Draw the triangles, vertex data now contains individual vertices
+        # so use array length
+        glDrawArrays(GL_TRIANGLES, 0, len(vertex_data))
 
         # Not strictly necessary because we only have 
         glDisableVertexAttribArray(0)
