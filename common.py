@@ -6,6 +6,12 @@ from OpenGL.GLUT.special import *
 from OpenGL.GL.shaders import *
 
 
+frame_count = 0
+
+def pre_frame():
+
+def post_fram():
+    frame_count += 1
 
 def disable_vsyc():
     import glfw
@@ -13,7 +19,7 @@ def disable_vsyc():
 
 def enable_vsyc():
     import glfw
-    glfw.swap_interval(0)
+    glfw.swap_interval(1)
 
 #return GLuint
 def LoadShaders(vertex_file_path,fragment_file_path):
