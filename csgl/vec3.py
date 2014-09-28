@@ -4,9 +4,10 @@
     A quick stand-in for the OpenGL mathematics (GLM) library.
     PyOpenGL supports numpy 
 """
+from __future__ import print_function
+
 from OpenGL.GL import *
 from multimethods import multimethod
-from multimethods import multimethod2
 
 import sys
 import math
@@ -93,6 +94,7 @@ class vec3(object):
 
             Notes:
                 Python doesn't support method overloading in the C++ sense so this 
+                utility method performs an r-value type check.  
         """
         rtype = type(b)
         if rtype is vec3:
@@ -102,6 +104,12 @@ class vec3(object):
 
     @staticmethod
     def arith_inline(op,a,b):
+        """ Perform arithmetic `op` on `self` and `b'
+
+            *See arith documentation for explanation.
+            **arith_inline handles: my_vec3 += other_vec3 -or-
+              my_vec3 += 3
+        """
         rtype = type(b)
         if rtype is vec3:
             a.x = op(a.x,b.x)
@@ -114,7 +122,7 @@ class vec3(object):
             a.z = op(a.z,b)
             return a
 
-    # todo: replace this hot hacky mess of method overloading
+    # todo: consider less visually awful approach to overloading.  
     def __add__(self, other):return vec3.arith(operator.add,self,other)
     def __iadd__(self,other):return vec3.arith_inline(operator.add,self,other)
     def __radd__(self,other):return vec3.arith(operator.add,self,other)
@@ -132,6 +140,11 @@ class vec3(object):
     def __rdiv__(self,other):return vec3.arith(operator.div,self,other)
 
     def __eq__(self,other):
+        """ Equality operator (==)
+
+            *Note: Be careful w/ comparing floating point values, use
+            some threshold for equality.
+        """
         if math.fabs(self.x - other.x) >= sys.float_info.epsilon:return False
         if math.fabs(self.y - other.y) >= sys.float_info.epsilon:return False
         if math.fabs(self.z - other.z) >= sys.float_info.epsilon:return False

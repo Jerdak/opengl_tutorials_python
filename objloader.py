@@ -1,3 +1,6 @@
+#! /usr/bin/env python
+from __future__ import print_function
+
 import math
 import sys
 
@@ -199,9 +202,9 @@ def load(file_name,normalize=False):
                 key = tokens[0]
                 value = obj_line_parsers[key](tokens)
                 obj_parse_assignment[key](value)
-            except Exception, err:
-                print "Ill formed line[%d]: %s"%(line_index,line)
-                print "Err: ",err
+            except Exception as err:
+                print("Ill formed line[%d]: %s"%(line_index,line))
+                print("Err: ",err)
       
     if normalize:
         verts = normalize_obj(verts)

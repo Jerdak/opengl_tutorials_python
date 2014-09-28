@@ -6,9 +6,10 @@
 """
 
 from __future__ import print_function
+
 from OpenGL.GL import *
-from vec3 import *
 from ctypes import *
+from csgl.vec3 import *
 
 import sys
 import math

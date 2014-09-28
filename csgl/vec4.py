@@ -4,6 +4,8 @@
 	A quick stand-in for the OpenGL mathematics (GLM) library.
 	PyOpenGL supports numpy 
 """
+from __future__ import print_function
+
 from OpenGL.GL import *
 
 import sys
@@ -137,9 +139,9 @@ def main():
 	y = x.copy()
 	y.x = 12
 	y = vec4.zero
-	print x
-	print y
-	print xy
+	print(x)
+	print(y)
+	print(xy)
 
 if __name__=='__main__':
 	main()

@@ -110,8 +110,7 @@ def glewInit(unsafe=False):
 
 	GLEW_OGL_INFO = collections.defaultdict(list)
 	for name in (GL_VENDOR,GL_RENDERER,GL_VERSION,GL_SHADING_LANGUAGE_VERSION,GL_EXTENSIONS):
-		#print(name,":",glGetString(name))
-		GLEW_OGL_INFO[name] = glGetString(name).split(' ')
+		GLEW_OGL_INFO[name] = glGetString(name).decode().split(' ')
 		
 	#It might be necessariy to use glGetStringi for extensions, so far glGetString has worked
 	#GLEW_OGL_INFO[GL_EXTENSIONS] = glGetStringi(GL_EXTENSIONS,<index>)
