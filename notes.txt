@@ -6,11 +6,17 @@ Tutorial 1 notes
 	- https://github.com/pyglfw/pyglfw   is another version w/ better documentation but the Florian one 
 	  above does a nicer job of wrapping functionality.
 3. original tuts call for glew, pyopengl seems to include ARB extensions as standard. 
-	a.  [] Research this a bit, find the differences between glew and pyopengl
-	b.  [] figure out how to query for ARB extension existence.  (Maybe http://pyopengl.sourceforge.net/pydoc/OpenGL.extensions.html\
+	a.  [] Research this a bit, does pyopengl expose glew.  Review pyopengl source.
+	b.  [] figure out how to query for ARB extension existence in pyopengl.  (Maybe http://pyopengl.sourceforge.net/pydoc/OpenGL.extensions.html\
+4.  Installation
+    1. pip3.4.exe install PyOpenGL PyOpenGL_accelerate
+    2. pip3.4.exe install Pillow
+    3. download https://github.com/FlorianRhiem/pyGLFW,  python setup.py install
+        a. Use the one included with this 
 
 Tutorial 2 notes:
-1.  !!!!! If you mix tabs and spaces the error gets silently squelched by 
+1.  !!!!! If you mix tabs and spaces the usual indentation error gets silently squelched by 
+    what I assume is OpenGL. It's not entirely clear why the error goes missing.
 2.  [] Create a custom tutorial describing the differences between VAO's, VBO's, and so on.
 	- http://www.opengl.org/wiki/Tutorial2:_VAOs,_VBOs,_Vertex_and_Fragment_Shaders_(C_/_SDL)
 	- http://www.arcsynthesis.org/gltut/Positioning/Tutorial%2005.html
@@ -19,7 +25,7 @@ Tutorial 2 notes:
 3.  Note the creation of a glew standin (used by tuts 1 and 2)
 
 Tutorial 3 notes:
-1.  Created a replacement for glm (not yuet complete.)
+1.  Created a replacement for glm (not yet complete.)
 	- Python operator overload http://rgruet.free.fr/PQR26/PQR2.6.html#SpecialMethods
 	- glm source (headers only, easy to read): https://github.com/g-truc/glm
 2.  glm matrices are defined in terms of columns, copy their source directly.
@@ -33,10 +39,10 @@ Tutorial 4 Notes:
 
 Tutorial 5 Notes:
 1.  Note for the user that there are several image processing libraries.  Some better than others.  :)
-2.  Use PIL to load images
+2.  Use Pillow (PIL fork) to load images
 3.  Research why glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) is necessary for
     displaying our image.  I'm assuming it's an issue with mipmapping but who knows.
-4.  Dig in to mipmapping, see if there is a way to generate your own mipmapped texturing using PIL
+4.  Dig in to mipmapping, see if there is a way to generate your own mipmapped texturing using Pillow
     operations
         - http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
 5.  Rename `bind_texture` modes to something resembling useful.
@@ -47,7 +53,7 @@ Tutorial 6 notes:
 otherwise it gets all jittery (will need to be fixed in later tuts.)
 
 Tutorial 7 notes:
-1.  OBJ loader created.  Some functionality is lacking and the lower requires normals and uvs
-or the loader gets all stupid.
+1.  OBJ loader created.  Some functionality is lacking and the loader requires normals and uvs
+or it gets all stupid
 2.  Don't go too far making the obj loader work.  It just needs to function w/ the given content.
 Let the user handle the rest.
