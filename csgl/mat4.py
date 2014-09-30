@@ -9,34 +9,58 @@ from __future__ import print_function
 
 from OpenGL.GL import *
 from ctypes import *
-from csgl.vec3 import *
+from vec3 import *
 
 import sys
 import math
 import copy
 
+# [Xx Yx Zx Tx]  [0 4 8  12]
+# [Xy Yy Zy Ty]  [1 5 9  13]
+# [Xz Yz Zz Tz]  [2 6 10 14]
+# [0  0  0  1 ]  [3 7 11 15]
+
 class mat4(object):
     def __init__(self,*data):
-        self.data_ = (GLfloat * 16)()
+        # ctype array to make it directly callable by tutorials.
+        self._data = (GLfloat * 16)()
+        
+        # special case, empty constructor fills matrix w/ zeroes
+        if len(data) == 0:
+            self.data = self.zeroes().data
+        else:
+            self.data = data
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self,data):
+         # mat4.data(0,1,2,.....,15)
         if len(data) == 16:
-            for i,d in enumerate(data): self.data_[i] = data[i]
+            for i,d in enumerate(data): self._data[i] = data[i]
+        
+        # mat4.data([0,1,2,.....,15])
         if len(data) == 1:
-            for i,d in enumerate(data[0]): self.data_[i] = data[0][i]
-        #if len(data) == 4:
+            for i,d in enumerate(data[0]): self._data[i] = data[0][i]
 
     def copy(self):
+        """ Create a new copy of matrix
+        """
         return copy.deepcopy(self)
 
-    # [Xx Yx Zx Tx]  [0 4 8  12]
-    # [Xy Yy Zy Ty]  [1 5 9  13]
-    # [Xz Yz Zz Tz]  [2 6 10 14]
-    # [0  0  0  1 ]  [3 7 11 15]
+    def __getitem__(self,row):
+        """ Allow matrix indexing using [row][col] notation.
 
-    def __getitem__(self,r):
-        return pointer(GLfloat.from_address(addressof(self.data_) + sizeof(GLfloat) * r* 4))
+            Equivalent to C++ operator[](int row, int col)
+        """
+        return pointer(GLfloat.from_address(addressof(self._data) + sizeof(GLfloat) * row * 4))
 
     @staticmethod
     def zeroes():
+        """ Fill w/ zeroes
+        """
         return mat4.fill(0)
 
     @staticmethod
@@ -91,6 +115,16 @@ class mat4(object):
         m[3][2] = vec3.dot(f, eye);
         return m
 
+    def transpose(self):
+        new_mat = mat4()
+        for r in range(0,4):
+            for c in range(0,4):
+                new_mat[c][r] = self[r][c]
+
+    def transposed(self):
+        new_mat = self.transpose()
+        self._data = new_mat._data
+
     def rotatex(self,angle):
         rad = math.radians(angle)
         m = self
@@ -100,19 +134,9 @@ class mat4(object):
         m[2][2] = math.cos(rad)
 
     def translate(self,vec3):
-        self.data_[12] = vec3.x
-        self.data_[13] = vec3.y
-        self.data_[14] = vec3.z
-
-    def __add__(self,other):
-        data = [self.data_[i] + other.data_[i] for i in range(0,16)] 
-        return mat4(*data)
-    
-    def __iadd__(self,other):
-        self.x += other.x
-        self.y += other.y
-        self.z += other.z
-        return self
+        self._data[12] = vec3.x
+        self._data[13] = vec3.y
+        self._data[14] = vec3.z
 
     def __mul__(self,other):
         m = mat4.zeroes()
@@ -129,71 +153,57 @@ class mat4(object):
 
         #print("result--\n",m)
         return m
-    
-    #TODO: Finish other operator overrides
-    #TODO: Copy vec3's operator overload example to allow mat4*vec3
-    #def __imul__(self,other):
-    #   self.x *= other.x
-    #   self.y *= other.y
-#       self.z *= other.z
-#       return self
 
-    # def __sub__(self,other):
-    #   return vec3(self.x-other.x,self.y-other.y,self.z-other.z)
-    
-    # def __isub__(self,other):
-    #   self.x -= other.x
-    #   self.y -= other.y
-    #   self.z -= other.z
-    #   return self
+    @staticmethod
+    def arith(op,a,b):
+        """ Perform arithmetic `op` on `a` and `b'
+        """
+        rtype = type(b)
+        if rtype is mat4:
+            ret = mat4()
+            for r in range(0,4):
+                for c in range(0,4):
+                    ret[r][c] = op(a[r][c],b[r][c])
+            return ret
+        elif rtype is float or rtype is int:
+            raise NotImplementedError("rtype vec4 not yet supported, but it should be. ")
 
-    # def __sub__(self,other):
-    #   return vec3(self.x-other.x,self.y-other.y,self.z-other.z)
-    
-    # def __isub__(self,other):
-    #   self.x -= other.x
-    #   self.y -= other.y
-    #   self.z -= other.z
-    #   return self
+    @staticmethod
+    def arith_inline(op,a,b):
+        """ Perform arithmetic `op` on `self` and `b'
+        """
+        rtype = type(b)
+        if rtype is mat4:
+            for r in range(0,4):
+                for c in range(0,4):
+                    a[r][c] = op(a[r][c],b[r][c])
+            return a
 
-    # def __mul__(self,other):
-    #   return vec3(self.x*other.x,self.y*other.y,self.z*other.z)
-    
-    # def __imul__(self,other):
-    #   self.x *= other.x
-    #   self.y *= other.y
-    #   self.z *= other.z
-    #   return self
+    def __add__(self, other):return mat4.arith(operator.add,self,other)
+    def __iadd__(self,other):return mat4.arith_inline(operator.add,self,other)
+    def __radd__(self,other):return mat4.arith(operator.add,self,other)
 
+    def __sub__(self, other):return mat4.arith(operator.sub,self,other)
+    def __isub__(self,other):return mat4.arith_inline(operator.sub,self,other)
+    def __rsub__(self,other):return mat4.arith(operator.sub,self,other)
 
-    # def __div__(self,other):
-    #   return vec3(self.x/other.x,self.y/other.y,self.z/other.z)
-    
-    # def __idiv__(self,other):
-    #   self.x /= other.x
-    #   self.y /= other.y
-    #   self.z /= other.z
-    #   return self
+    def __eq__(self,other):
+        for i in range(0,16):
+            if math.fabs(self.data[i] - other.data[i]) >= sys.float_info.epsilon:return False
+        return True
 
-    # def __eq__(self,other):
-    #   if math.fabs(self.x - other.x) >= sys.float_info.epsilon:return False
-    #   if math.fabs(self.y - other.y) >= sys.float_info.epsilon:return False
-    #   if math.fabs(self.z - other.z) >= sys.float_info.epsilon:return False
-    #   return True
-
-    # def __ne__(self,other):
-    #   return not (self==other)
-
+    def __ne__(self,other):
+        return not (self==other)
 
     def __str__(self):
         return unicode(self).encode('utf-8')
 
     def __unicode__(self):
         return "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n"%(
-            self.data_[0],self.data_[1],self.data_[2],self.data_[3],
-            self.data_[4],self.data_[5],self.data_[6],self.data_[7],
-            self.data_[8],self.data_[9],self.data_[10],self.data_[11],
-            self.data_[12],self.data_[13],self.data_[14],self.data_[15]
+            self._data[0],self._data[1],self._data[2],self._data[3],
+            self._data[4],self._data[5],self._data[6],self._data[7],
+            self._data[8],self._data[9],self._data[10],self._data[11],
+            self._data[12],self._data[13],self._data[14],self._data[15]
         )
 
 def main():
@@ -211,7 +221,10 @@ def main():
     xpy = x+y
     print(x)
     print(xpy)
-
+    print(x==y)
+    print(y==x)
+    print(xpy==x)
+    print(xpy!=x)
     arr = c_int * 5
     x = arr(0,1,2,3,4)
     y = pointer(c_int.from_address(addressof(x) + sizeof(c_int)))
@@ -238,6 +251,9 @@ def main():
     x[3][0] = 4
     x[3][1] = 4
     x[3][2] = 4
+    print(x)
+
+    x = mat4()
     print(x)
     #glm::mat4 MVP        = Projection * View * Model;
 #   mvp = 

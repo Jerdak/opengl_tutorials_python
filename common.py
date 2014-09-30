@@ -9,7 +9,8 @@ from OpenGL.GL.shaders import *
 frame_count = 0
 
 def pre_frame():
-
+    pass
+    
 def post_fram():
     frame_count += 1
 

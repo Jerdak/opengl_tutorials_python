@@ -208,9 +208,9 @@ def main():
 
         # Send our transformation to the currently bound shader, 
         # in the "MVP" uniform
-        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data_)
-        glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, ModelMatrix.data_);
-        glUniformMatrix4fv(view_matrix_id, 1, GL_FALSE, ViewMatrix.data_);
+        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data)
+        glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, ModelMatrix.data);
+        glUniformMatrix4fv(view_matrix_id, 1, GL_FALSE, ViewMatrix.data);
 
         lightPos = vec3(4,4,4)
         glUniform3f(light_id, lightPos.x, lightPos.y, lightPos.z)

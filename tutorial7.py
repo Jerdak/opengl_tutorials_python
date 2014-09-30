@@ -150,13 +150,13 @@ def main():
     matrix_id = glGetUniformLocation(program_id, "MVP")
 
     # Load the texture
-    texture = load_image(".\\content\\eva.bmp")
+    texture = load_image(".\\content\\uvmap.bmp")
 
     # Get a handle for our "myTextureSampler" uniform
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
 
     # Read our OBJ file
-    vertices,faces,uvs,normals,colors = objloader.load(".\\content\\eva.obj")
+    vertices,faces,uvs,normals,colors = objloader.load(".\\content\\cube.obj")
     vertex_data,uv_data,normal_data = objloader.process_obj( vertices,faces,uvs,normals,colors)
 
     # Our OBJ loader uses Python lists, convert to ctype arrays before sending to OpenGL
@@ -189,7 +189,7 @@ def main():
 
         # Send our transformation to the currently bound shader, 
         # in the "MVP" uniform
-        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data_)
+        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data)
         
         # Bind our texture in Texture Unit 0
         glActiveTexture(GL_TEXTURE0)

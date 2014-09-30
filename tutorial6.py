@@ -250,7 +250,7 @@ def main():
 
         # Send our transformation to the currently bound shader, 
         # in the "MVP" uniform
-        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data_)
+        glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data)
         
         # Bind our texture in Texture Unit 0
         glActiveTexture(GL_TEXTURE0);

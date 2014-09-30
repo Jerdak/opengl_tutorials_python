@@ -200,7 +200,7 @@ def main():
 
 		# Send our transformation to the currently bound shader, 
 		# in the "MVP" uniform
-		glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data_)
+		glUniformMatrix4fv(matrix_id, 1, GL_FALSE,mvp.data)
 		# Bind vertex buffer data to the attribute 0 in our shader.
 		# Note:  This can also be done in the VAO itself (see vao_test.py)
 
