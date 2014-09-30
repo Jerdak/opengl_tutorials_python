@@ -9,7 +9,8 @@ from __future__ import print_function
 
 from OpenGL.GL import *
 from ctypes import *
-from vec3 import *
+from csgl.vec3 import *
+from csgl.vec4 import *
 
 import sys
 import math
@@ -205,58 +206,3 @@ class mat4(object):
             self._data[8],self._data[9],self._data[10],self._data[11],
             self._data[12],self._data[13],self._data[14],self._data[15]
         )
-
-def main():
-    x = mat4(
-        1,1,1,1,
-        1,1,1,1,
-        1,1,1,1,
-        1,1,1,1)
-    y = mat4(
-        1,1,1,1,
-        1,1,1,1,
-        1,1,1,1,
-        1,1,1,1)
-
-    xpy = x+y
-    print(x)
-    print(xpy)
-    print(x==y)
-    print(y==x)
-    print(xpy==x)
-    print(xpy!=x)
-    arr = c_int * 5
-    x = arr(0,1,2,3,4)
-    y = pointer(c_int.from_address(addressof(x) + sizeof(c_int)))
-    print(y[1])
-    projection = mat4.perspective(45.0, 4.0 / 3.0, 0.1, 100.0)
-    view = mat4.lookat(vec3(4,3,3), # Camera is at (4,3,3), in World Space
-                    vec3(0,0,0), # and looks at the origin
-                    vec3(0,1,0)) 
-    model = mat4.identity()
-
-    mvp = model * view * projection
-
-    print(mvp)
-    x = mat4.zeroes()
-    x[0][0] = 1
-    x[1][0] = 1
-    x[2][0] = 1
-    x[0][1] = 2
-    x[1][1] = 2
-    x[2][1] = 2
-    x[0][2] = 3
-    x[1][2] = 3
-    x[2][2] = 3
-    x[3][0] = 4
-    x[3][1] = 4
-    x[3][2] = 4
-    print(x)
-
-    x = mat4()
-    print(x)
-    #glm::mat4 MVP        = Projection * View * Model;
-#   mvp = 
-    #x[0][4]
-if __name__=='__main__':
-    main()

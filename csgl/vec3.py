@@ -5,6 +5,7 @@
     PyOpenGL supports numpy 
 """
 from __future__ import print_function
+from __future__ import division
 
 from OpenGL.GL import *
 from multimethods import multimethod
@@ -135,6 +136,11 @@ class vec3(object):
     def __imul__(self,other):return vec3.arith_inline(operator.mul,self,other)
     def __rmul__(self,other):return vec3.arith(operator.mul,self,other)
 
+    # for python 3
+    def __truediv__(self, other):return vec3.arith(operator.truediv,self,other)
+    def __itruediv__(self,other):return vec3.arith_inline(operator.truediv,self,other)
+    def __rtruediv__(self,other):return vec3.arith(operator.truediv,self,other)
+
     def __div__(self, other):return vec3.arith(operator.div,self,other)
     def __idiv__(self,other):return vec3.arith_inline(operator.div,self,other)
     def __rdiv__(self,other):return vec3.arith(operator.div,self,other)
@@ -158,29 +164,3 @@ class vec3(object):
 
     def __unicode__(self):
         return "%f %f %f"%(self.x,self.y,self.z)
-
-def main():
-    x = vec3(1,2,3)
-    y = vec3(1,2,3)
-    xy = x+y
-    print(xy)
-    print(x+1)
-    print(12+x)
-
-    xy = x*y
-    print(xy)
-    xy = 1+x*y
-    print(xy)
-    return
-    
-    xy_actual = vec3(2,4,6)
-    assert(xy == xy_actual)
-
-    x = vec3(2,1,-1)
-    y = vec3(-3,4,1)
-    assert(vec3.cross(x,y)==vec3(5,1,11))
-    assert(vec3.cross(y,x)==vec3(-5,-1,-11))
-
-    vec3.lerp(x,y,0.5)
-if __name__=='__main__':
-    main()
