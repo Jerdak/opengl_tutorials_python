@@ -7,6 +7,10 @@
 	The naming convention in this script mimics that of the 
 	official GLEW API, that should make switching to the real
 	thing a little easier.
+
+	TODO:
+		[] -  See http://pyopengl.sourceforge.net/documentation/opengl_diffs.html and consider scrapping the GLEW
+    lookup or simply wrapping PyOpenGL's native behaviour.
 """
 from __future__ import print_function
 

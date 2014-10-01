@@ -33,7 +33,7 @@ glew           |  glew_wish
 obj loader     |  objloader.py
 
 
-* **cgsl**:  Computer graphics simple lib (CGSL) is a hacky little bit of code I threw together to mimick the behaviour of the C++ tutorials.  I avoided leveraging more complex modules like Numpy to mimize the mental bandwidth cost of reading through the Python code.
+* **cgsl**: Curiously simple graphics library (CSGL) is a hacky little bit of code I threw together to mimic GLM in the original C++ tutorials. Given more time I may go back and do a proper port. The idea with CSGL was to avoid using complex modules like Numpy that are beyond the scope of these tutorials. The reader has enough mental bandwidth issues without also having to understand Numpy's mechanics.
 * **glew_wish**: Very much a tongue in cheek kludge to support GLEW's functionality querying.  GLEW is rarely used in the beginner tutorials so this code is unfinished.
 * **objloader.py**: The original C++ code creates its own Wavefront OBJ loader that supports a very specific output format from Blender.  I copied the original tutorials exactly meaning you need both a UVs and Normals or the importer won't know what to do.
  
