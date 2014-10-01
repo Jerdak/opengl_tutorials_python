@@ -90,31 +90,6 @@ def main():
 	# Our ModelViewProjection : multiplication of our 3 matrices
 	mvp = projection * view * model
 	
-	# print("v--\n",view)
-	# print("p--\n",projection)
-	# projection.id = "projection"
-	# view.id = "view"
-	# pv = projection * view
-	# print("pv--\n",pv)
-	# vp = view * projection
-	# print("vp--\n",vp)
-
-	# pv = projection*view
-	# pvp = pv * projection
-	# pvpp1 = pvp * projection
-	# pvpp2 = projection*view*projection*projection*view*view*view*projection
-	# print("pvpp1--\n",pvpp1)
-	# print("pvpp2--\n",pvpp2)
-	# print("projection--\n",projection)
-	# return
-
-	# mvp = model * view * projection
-	# print("--\n",mvp)
-	# print("--\n",projection)
-	# print("--\n",view)
-	# print("--\n",model)
-
-	
 	vertex_data = [-1.0, -1.0, 0.0,
 					1.0, -1.0, 0.0,
 					0.0,  1.0, 0.0]
