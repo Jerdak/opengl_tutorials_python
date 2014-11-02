@@ -15,12 +15,14 @@ from glew_wish import *
 from csgl import *
 from PIL.Image import open as pil_open
 
+import texture as textureutils
 import common
 import glfw
 import sys
 import os
 import controls
 import objloader
+import vboindexer
 
 # Global window
 window = None
@@ -57,66 +59,24 @@ def opengl_init():
         return False
     return True
 
-def bind_texture(texture_id,mode):
-    """ Bind texture_id using several different modes
+def c_type_fill(data,data_type):
+    rows = len(data)
+    cols = len(data[0])
+    t = rows * (cols * data_type)
+    tmp = t()
+    for r in range(rows):
+        for c in range(cols):
+            tmp[r][c] = data[r][c]
+    return tmp
 
-        Notes:
-            Without mipmapping the texture is incomplete
-            and requires additional constraints on OpenGL
-            to properly render said texture.
-
-            Use 'MIN_FILTER" or 'MAX_LEVEL' to render
-            a generic texture with a single resolution
-        Ref:
-            [] - http://www.opengl.org/wiki/Common_Mistakes#Creating_a_complete_texture
-            [] - http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
-        TODO:
-            - Rename modes to something useful
-    """
-    if mode == 'DEFAULT':
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        glPixelStorei(GL_UNPACK_ALIGNMENT,1) 
-    elif mode == 'MIN_FILTER':
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        glPixelStorei(GL_UNPACK_ALIGNMENT,1) 
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    elif mode == 'MAX_LEVEL':
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        glPixelStorei(GL_UNPACK_ALIGNMENT,1) 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
-    else:
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        glPixelStorei(GL_UNPACK_ALIGNMENT,1)
-
-    # Generate mipmaps?  Doesn't seem to work
-    glGenerateMipmap(GL_TEXTURE_2D)
-
-def load_image(file_name):
-    im = pil_open(file_name)
-    try:
-        width,height,image = im.size[0], im.size[1], im.tostring("raw", "RGBA", 0, -1)
-    except SystemError:
-        width,height,image = im.size[0], im.size[1], im.tostring("raw", "RGBX", 0, -1)
-
-    texture_id =  glGenTextures(1)
-
-    # To use OpenGL 4.2 ARB_texture_storage to automatically generate a single mipmap layer
-    # uncomment the 3 lines below.  Note that this should replaced glTexImage2D below.
-    #bind_texture(texture_id,'DEFAULT')
-    #glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
-    #glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,image)
-    
-    # "Bind" the newly created texture : all future texture functions will modify this texture
-    bind_texture(texture_id,'MIN_FILTER')
-    glTexImage2D(
-           GL_TEXTURE_2D, 0, 3, width, height, 0,
-           GL_RGBA, GL_UNSIGNED_BYTE, image
-       )
-    return texture_id
+def c_type_fill_1D(data,data_type):
+    rows = len(data)
+   
+    t = rows * data_type
+    tmp = t()
+    for r in range(rows):
+        tmp[r] = data[r]
+    return tmp
 
 def main():
 
@@ -144,8 +104,8 @@ def main():
     glBindVertexArray( vertex_array_id )
 
     # Create and compile our GLSL program from the shaders
-    program_id = common.LoadShaders( ".\\shaders\\Tutorial8\\StandardShading.vertexshader",
-        ".\\shaders\\Tutorial8\\StandardShading.fragmentshader" )
+    program_id = common.LoadShaders( ".\\shaders\\Tutorial9\\StandardShading.vertexshader",
+        ".\\shaders\\Tutorial9\\StandardShading.fragmentshader" )
     
     # Get a handle for our "MVP" uniform
     matrix_id = glGetUniformLocation(program_id, "MVP")
@@ -153,7 +113,7 @@ def main():
     model_matrix_id = glGetUniformLocation(program_id, "M")
 
     # Load the texture
-    texture = load_image(".\\content\\uvmap_suzanne.bmp")
+    texture = textureutils.load_image(".\\content\\uvmap_suzanne.bmp")
 
     # Get a handle for our "myTextureSampler" uniform
     texture_id  = glGetUniformLocation(program_id, "myTextureSampler")
@@ -167,18 +127,31 @@ def main():
     uv_data = objloader.generate_2d_ctypes(uv_data)
     normal_data = objloader.generate_2d_ctypes(normal_data)
 
+    indexed_vertices, indexed_uvs, indexed_normals, indices = vboindexer.indexVBO(vertex_data,uv_data,normal_data)
+    
+    indexed_vertices = c_type_fill(indexed_vertices,GLfloat)
+    indexed_uvs = c_type_fill(indexed_uvs,GLfloat)
+    indexed_normals = c_type_fill(indexed_normals,GLfloat)
+    indices = c_type_fill_1D(indices,GLushort)
+
+
     # Load OBJ in to a VBO
     vertex_buffer = glGenBuffers(1);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-    glBufferData(GL_ARRAY_BUFFER, len(vertex_data) * 4 * 3, vertex_data, GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, len(indexed_vertices) * 4 * 3, indexed_vertices, GL_STATIC_DRAW)
 
     uv_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
-    glBufferData(GL_ARRAY_BUFFER, len(uv_data) * 4 * 2, uv_data, GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, len(indexed_uvs) * 4 * 2, indexed_uvs, GL_STATIC_DRAW)
 
     normal_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)
-    glBufferData(GL_ARRAY_BUFFER, len(normal_data) * 4 * 3, normal_data, GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, len(indexed_normals) * 4 * 3, indexed_normals, GL_STATIC_DRAW)
+
+    # Generate a buffer for the indices as well
+    elementbuffer = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer)
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, len(indices) * 2, indices , GL_STATIC_DRAW);
 
     # vsync and glfw do not play nice.  when vsync is enabled mouse movement is jittery.
     common.disable_vsyc()
@@ -195,7 +168,7 @@ def main():
 
         current_time = glfw.get_time()
         if current_time - last_time >= 1.0:
-            glfw.set_window_title(window,"Tutorial 8.  FPS: %d"%(frames))
+            glfw.set_window_title(window,"Tutorial 9.  FPS: %d"%(frames))
             frames = 0
             last_time = current_time
 
@@ -261,8 +234,17 @@ def main():
 
         # Draw the triangles, vertex data now contains individual vertices
         # so use array length
-        glDrawArrays(GL_TRIANGLES, 0, len(vertex_data))
+       # glDrawArrays(GL_TRIANGLES, 0, len(vertex_data))
+        # Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer)
 
+        # Draw the triangles !
+        glDrawElements(
+            GL_TRIANGLES,           # mode
+            len(indices),           # count
+            GL_UNSIGNED_SHORT,      # type
+            null                    # element array buffer offset
+        )
         # Not strictly necessary because we only have 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)

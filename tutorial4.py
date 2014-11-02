@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """ Tutorial 4: A Colored Cube
 """
 

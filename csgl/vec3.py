@@ -29,6 +29,9 @@ class vec3(object):
         self.y = y
         self.z = z
     
+    def __hash__(self):
+        return hash((self.x,self.y,self.z))
+        
     def copy(self):
         return copy.deepcopy(self)
 

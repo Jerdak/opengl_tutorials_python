@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """ Tutorial 2: Drawing the triangle
 """
 
