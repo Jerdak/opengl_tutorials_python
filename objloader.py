@@ -7,7 +7,7 @@ import sys
 from collections import defaultdict
 from OpenGL.GL import *
 
-def normalize_vertex_array(verts):
+def normalize_vertex_list(verts):
     """ Uniformly rescale 3D vertex data so that its axis of
         greatest change is normalized to the range [0,1]
 
@@ -49,7 +49,7 @@ def normalize_vertex_array(verts):
         Original input is unmodified
     """
     new_verts = list(verts)
-    normalize_vertex_array(new_vert)
+    normalize_vertex_list(new_vert)
     return new_verts
 
 def parse_vertex_line(tokens):
@@ -149,8 +149,7 @@ def parse_face_line(tokens):
     a3 = int(f3[0]) if f3[0] != '' else None
     b3 = int(f3[1]) if f3[1] != '' else None
     c3 = int(f3[2]) if f3[2] != '' else None
-    # Wavefront .obj stores faces in one-based numbering, subtract 1
-    # from each index to properly index vertex array
+
     return[a1,a2,a3,b1,b2,b3,c1,c2,c3]
 
 

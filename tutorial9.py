@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-""" Tutorial 8: Basic Shading
+""" Tutorial 9: Basic Shading
 """
 
 from __future__ import print_function
@@ -36,7 +36,7 @@ def opengl_init():
         return False
 
     # Open Window and create its OpenGL context
-    window = glfw.create_window(1024, 768, "Tutorial 08", None, None) #(in the accompanying source code this variable will be global)
+    window = glfw.create_window(1024, 768, "Tutorial 09", None, None) #(in the accompanying source code this variable will be global)
     glfw.window_hint(glfw.SAMPLES, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)

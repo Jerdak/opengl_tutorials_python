@@ -64,6 +64,24 @@ or it gets all stupid
 2.  Don't go too far making the obj loader work.  It just needs to function w/ the given content.
 Let the user handle the rest.
 
+Tutorial 9 notes:
+1. Added texture.py to handle various texture/image related functionality.  Review original C++ tuts
+to figure out when those authors move texture functions to a dedicated file.
+2. Added vboindexer.py with some additional, possibly confusing, code for mimicing
+C++'s std::map::find behaviour.  Python's default dict is unordered so the original vboindexer.cpp
+had to be modified to do an equality, not a greater than, memory block comparison.  This requires loading
+the "c" library.  This probably isn't worth explaining in the Python tuts.
+
+Byte Sizes:
+-----------
+Byte lengths are hardcoded right now 
+
+e.g. glBufferData(GL_ARRAY_BUFFER, len(data) * 4 * 3, indexed_normals, GL_STATIC_DRAW)
+
+Here, (len(data) * 4 * 3) = number of objects * 4 bytes per float * 3 floats per objects.  
+
+ctypes.sizeof is one possible solution for automate byte-size detection.
+
 Relative imports (unit tests)
 ------------------------------
 - Unit tests are inline w/ the module they are testing.  This was supposed to keep the primary source
@@ -73,3 +91,4 @@ scripts are run inside module folders (https://mail.python.org/pipermail/python-
 To run them either use `nosetests` (https://nose.readthedocs.org/en/latest/) inside the mod folder or call 
 the tests directly w/ `python -m csgl.test_example`
 
+Better explanation: http://stackoverflow.com/questions/72852/how-to-do-relative-imports-in-python

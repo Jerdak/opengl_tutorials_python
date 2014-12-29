@@ -1,6 +1,5 @@
 
 # OpenGL-Tutorials in Python
----
 
 This repository contains Python versions of the C++ tutorials at [opengl-tutorials](www.opengl-tutorials.org).
 
@@ -38,7 +37,7 @@ obj loader     |  objloader.py
 
 ## Completed Conversions
 
-* ### Basic OpenGL
+* Basic OpenGL
   * Tutorial 1 : Opening a window [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial1.py)]
   * Tutorial 2 : The first triangle [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial2.py)]
   * Tutorial 3 : Matrices [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial3.py)]
@@ -47,11 +46,11 @@ obj loader     |  objloader.py
   * Tutorial 6 : Keyboard and Mouse [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial6.py)]
   * Tutorial 7 : Model loading [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial7.py)]
   * Tutorial 8 : Basic shading [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial8.py)]
-* ### Intermediate Tutorials
+* Intermediate Tutorials
   * Tutorial 9 : VBO Indexing [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial9.py)]
 
 ## Ongoing Conversions
-* ### Intermediate Tutorials
+* Intermediate Tutorials
   * Tutorial 10 : Transparency
   * Tutorial 11 : 2D text
   * Tutorial 12 : OpenGL Extensions
@@ -63,7 +62,7 @@ obj loader     |  objloader.py
   * Tutorial 18 : Billboards & Particles
 
 # License(s)
----
+
 ### Original
 [WTFPL Public License Version 2](http://www.opengl-tutorial.org/download/)*
 
