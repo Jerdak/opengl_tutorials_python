@@ -25,15 +25,15 @@ A few of the original C++ tutorials contain references to libraries that don't h
 
 CPP Tutorials  |  Python Tutorials
 -------------  |  ----------------
-glm            |  cgsl 
+glm            |  cgsl
 glew           |  glew_wish
 obj loader     |  objloader.py
 
 
-* **cgsl**: Curiously simple graphics library (CSGL) is a hacky little bit of code I threw together to mimic GLM from the original C++ tutorials. Given more time I may go back and do a proper port. The idea with CSGL was to avoid using complex modules like Numpy that are beyond the scope of these tutorials. 
+* **cgsl**: Curiously simple graphics library (CSGL) is a hacky little bit of code I threw together to mimic GLM from the original C++ tutorials. Given more time I may go back and do a proper port. The idea with CSGL was to avoid using complex modules like Numpy that are beyond the scope of these tutorials.
 * **glew_wish**: Very much a tongue in cheek kludge to support GLEW's function querying.  GLEW is rarely used in the beginner tutorials so this code was never finished.  It will handle the basics and the reason can take it as an exercise to finish what I started or do a proper GLEW port.  In a perfect world I would do something similar to `pyglfw` like wrapping the GLEW binaries.
 * **objloader.py**: The original C++ code creates its own Wavefront OBJ loader that supports a very specific output format from Blender.  I copied the original tutorials exactly, meaning you need both  UVs and Normals in your Blender output or `objloader.py` won't know what to do.
- 
+
 
 ## Completed Conversions
 
@@ -51,7 +51,7 @@ obj loader     |  objloader.py
 
 ## Ongoing Conversions
 * Intermediate Tutorials
-  * Tutorial 10 : Transparency
+  * Tutorial 10 : Transparency [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial10.py)]
   * Tutorial 11 : 2D text
   * Tutorial 12 : OpenGL Extensions
   * Tutorial 13 : Normal Mapping
