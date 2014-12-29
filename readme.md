@@ -48,10 +48,9 @@ obj loader     |  objloader.py
   * Tutorial 8 : Basic shading [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial8.py)]
 * Intermediate Tutorials
   * Tutorial 9 : VBO Indexing [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial9.py)]
+  * Tutorial 10 : Transparency [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial10.py)]
 
 ## Ongoing Conversions
-* Intermediate Tutorials
-  * Tutorial 10 : Transparency [[source](https://github.com/Jerdak/opengl_tutorials_python/blob/master/tutorial10.py)]
   * Tutorial 11 : 2D text
   * Tutorial 12 : OpenGL Extensions
   * Tutorial 13 : Normal Mapping
