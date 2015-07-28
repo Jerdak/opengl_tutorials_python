@@ -1,1 +1,6 @@
 *.pyc
+Content/male_apose_closed2.obj
+Content/male_apose_closed.obj
+glfw3.dll
+test.bmp
+out.txt

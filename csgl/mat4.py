@@ -2,7 +2,7 @@
 """ The curiously simply graphics library
 
     A quick stand-in for the OpenGL mathematics (GLM) library.
-    PyOpenGL supports numpy 
+    PyOpenGL supports numpy
 """
 
 from __future__ import print_function
@@ -25,7 +25,7 @@ class mat4(object):
     def __init__(self,*data):
         # ctype array to make it directly callable by tutorials.
         self._data = (GLfloat * 16)()
-        
+
         # special case, empty constructor fills matrix w/ zeroes
         if len(data) == 0:
             self.data = self.zeroes().data
@@ -41,7 +41,7 @@ class mat4(object):
          # mat4.data(0,1,2,.....,15)
         if len(data) == 16:
             for i,d in enumerate(data): self._data[i] = data[i]
-        
+
         # mat4.data([0,1,2,.....,15])
         if len(data) == 1:
             for i,d in enumerate(data[0]): self._data[i] = data[0][i]
@@ -89,7 +89,7 @@ class mat4(object):
         m[1][1] = 1.0 / (tan_half_fov)
         m[2][2] = -(z_far+z_near) / (z_far - z_near)
         m[2][3] = -1.0
-        m[3][2] = -(2.0 * z_far * z_near) / (z_far - z_near) 
+        m[3][2] = -(2.0 * z_far * z_near) / (z_far - z_near)
         return m
 
     @staticmethod
@@ -141,12 +141,12 @@ class mat4(object):
 
     def __mul__(self,other):
         m = mat4.zeroes()
-        
+
         # swap matrix multiplication order to account for right sided (column oriented) multiplcation
         # glm was the basis for this code. (their code is much prettier)
         a = other#self
         b = self#other
-        
+
         for r in range(0,4):
             for c in range(0,4):
                 for i in range(0,4):
@@ -197,9 +197,14 @@ class mat4(object):
         return not (self==other)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n"%(
+            self._data[0],self._data[1],self._data[2],self._data[3],
+            self._data[4],self._data[5],self._data[6],self._data[7],
+            self._data[8],self._data[9],self._data[10],self._data[11],
+            self._data[12],self._data[13],self._data[14],self._data[15])
 
     def __unicode__(self):
+        print("unicode");
         return "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n"%(
             self._data[0],self._data[1],self._data[2],self._data[3],
             self._data[4],self._data[5],self._data[6],self._data[7],

@@ -29,17 +29,17 @@ def normalize_vertex_list(verts):
     mean = [a+b for a,b in zip(v_max,v_min)]
     mean = [a/2.0 for a in mean]
 
-    # translate vertices 
+    # translate vertices
     for v in verts:
         for i in range(0,3):
             v[i] -= mean[i]
 
     v_max = [a+b for a,b in zip(v_max,mean)]
     v_min = [a+b for a,b in zip(v_min,mean)]
-    
+
     global g_Translate
     rad = math.fabs(max(v_max) - min(v_min))
-    #g_Translate[2] = -rad 
+    #g_Translate[2] = -rad
     return verts
 
 def normalize_vertex_array(verts):
@@ -138,21 +138,28 @@ def parse_face_line(tokens):
     f2 = fs[1].split('/')
     f3 = fs[2].split('/')
 
-    a1 = int(f1[0]) if f1[0] != '' else None
-    b1 = int(f1[1]) if f1[1] != '' else None
-    c1 = int(f1[2]) if f1[2] != '' else None
-    
-    a2 = int(f2[0]) if f2[0] != '' else None
-    b2 = int(f2[1]) if f2[1] != '' else None
-    c2 = int(f2[2]) if f2[2] != '' else None
-        
-    a3 = int(f3[0]) if f3[0] != '' else None
-    b3 = int(f3[1]) if f3[1] != '' else None
-    c3 = int(f3[2]) if f3[2] != '' else None
+    ret = []
 
-    return[a1,a2,a3,b1,b2,b3,c1,c2,c3]
+    if len(f1) == 3:
+        a1 = int(f1[0]) if f1[0] != '' else None
+        b1 = int(f1[1]) if f1[1] != '' else None
+        c1 = int(f1[2]) if f1[2] != '' else None
 
+        a2 = int(f2[0]) if f2[0] != '' else None
+        b2 = int(f2[1]) if f2[1] != '' else None
+        c2 = int(f2[2]) if f2[2] != '' else None
 
+        a3 = int(f3[0]) if f3[0] != '' else None
+        b3 = int(f3[1]) if f3[1] != '' else None
+        c3 = int(f3[2]) if f3[2] != '' else None
+
+        return[a1,a2,a3,b1,b2,b3,c1,c2,c3]
+
+    if len(f1) == 1:
+        a1 = int(f1[0]) if f1[0] != '' else None
+        a2 = int(f2[0]) if f2[0] != '' else None
+        a3 = int(f3[0]) if f3[0] != '' else None
+        return [a1,a2,a3]
 
 def load(file_name,normalize=False):
     """ Load Wavefront OBJ
@@ -204,11 +211,18 @@ def load(file_name,normalize=False):
             except Exception as err:
                 print("Ill formed line[%d]: %s"%(line_index,line))
                 print("Err: ",err)
-      
+
     if normalize:
         verts = normalize_obj(verts)
 
     return verts,faces,uvs,norms,colors
+
+def cross(a,b):
+    return [a[1]*b[2] - a[2]*b[1],a[0]*b[2] - a[2]*b[0],a[0]*b[1] - a[1]*b[0]]
+def vlen(a):
+    return math.sqrt(a[0]*a[0] +  a[1]*a[1] +  a[2]*a[2])
+def vsub(a,b):
+    return [a[0]-b[0],a[1]-b[1],a[2]-b[2]]
 
 def process_obj(verts,faces,uvs,normals,colors):
     """ Split 6-component facial data in to individual triangles
@@ -224,17 +238,41 @@ def process_obj(verts,faces,uvs,normals,colors):
     out_uvs = []
     out_normals = []
     for face in faces:
-        out_verts.append(verts[face[0]-1])
-        out_verts.append(verts[face[1]-1])
-        out_verts.append(verts[face[2]-1])
+        if len(face) == 9:
+            out_verts.append(verts[face[0]-1])
+            out_verts.append(verts[face[1]-1])
+            out_verts.append(verts[face[2]-1])
 
-        out_uvs.append(uvs[face[3]-1])
-        out_uvs.append(uvs[face[4]-1])
-        out_uvs.append(uvs[face[5]-1])
+            if len(uvs) == len(verts):
+                out_uvs.append(uvs[face[3]-1])
+                out_uvs.append(uvs[face[4]-1])
+                out_uvs.append(uvs[face[5]-1])
+            else:
+                out_uvs.append(0)
+                out_uvs.append(0)
+                out_uvs.append(0)
 
-        out_normals.append(normals[face[6]-1])
-        out_normals.append(normals[face[7]-1])
-        out_normals.append(normals[face[8]-1])
+            out_normals.append(normals[face[6]-1])
+            out_normals.append(normals[face[7]-1])
+            out_normals.append(normals[face[8]-1])
+        elif len(face) == 3:
+            out_verts.append(verts[face[0]-1])
+            out_verts.append(verts[face[1]-1])
+            out_verts.append(verts[face[2]-1])
+
+            edge1 = vsub(verts[face[2]-1],verts[face[0]-1])
+            edge2 = vsub(verts[face[1]-1],verts[face[0]-1])
+
+            normal = cross(edge1,edge2)
+            length = vlen(normal)
+
+            normal[0] /= length
+            normal[1] /= length
+            normal[2] /= length
+
+            out_normals.append(normal)
+            out_normals.append(normal)
+            out_normals.append(normal)
     return out_verts,out_uvs,out_normals
 
 def generate_2d_ctypes(data):
@@ -243,14 +281,14 @@ def generate_2d_ctypes(data):
         Input:
             data - 2D array like vertices[36][3]
                 Format: array[rows][cols] where rows are individual elements
-                and cols are components of each element.  
+                and cols are components of each element.
     """
     c = len(data[0])
     r = len(data)
 
     # multidimensional ctype arrays require parens
     # or the array type below would become float[r*c]
-    # instead of float[r][c].  Alternative notation: 
+    # instead of float[r][c].  Alternative notation:
     # array_type = GLfloat*c*r
     array_type = r * (c*GLfloat)
     ret = array_type()
@@ -278,13 +316,13 @@ def main():
     # assert(f==None)
 
     # v = parse_vertex_line(['v','0.1','0.2','0.3'])
-    # assert(v[0] == 0.1 and v[1] == 0.2 and v[2] == 0.3) 
+    # assert(v[0] == 0.1 and v[1] == 0.2 and v[2] == 0.3)
 
     # v = parse_vertex_line(['v','0.1','0.2','0.3','1','2','3'])
-    # assert(v[0] == 0.1 and v[1] == 0.2 and v[2] == 0.3) 
+    # assert(v[0] == 0.1 and v[1] == 0.2 and v[2] == 0.3)
 
     # v = parse_vertex_line(['v','0.1','0.2'])
-    # assert(v == None) 
+    # assert(v == None)
 
     # c = obj_line_parsers["#"](["asdasd"])
     # #obj_parse_assignment["#"](c)
@@ -297,6 +335,3 @@ def main():
     print(n[0])
 if __name__ == '__main__':
     main()
-
-
-
